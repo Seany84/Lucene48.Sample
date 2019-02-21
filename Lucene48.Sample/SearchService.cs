@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lucene.Net.Analysis;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -15,9 +16,9 @@ namespace Lucene48.Sample
             Analyzer analyzer = new CaseInsensitiveWhiteSpaceAnalyser();
             var writer = new IndexWriter(new RAMDirectory(), new IndexWriterConfig(LuceneVersion.LUCENE_48, analyzer));
 
-            var products = IndexItems;
+            var products = GenerateProducts();
 
-            var totalOrderCount = Convert.ToSingle(IndexItems.Sum(x => x.OrderCount));
+            var totalOrderCount = Convert.ToSingle(products.Sum(x => x.OrderCount));
 
             foreach (var product in products)
             {
@@ -33,11 +34,12 @@ namespace Lucene48.Sample
         {
             return new List<ProductSearchDto>
             {
-                new ProductSearchDto{ProductId = "001", Description = "",  LargeImageUrl = "", OrderCount =  2323,ProductName = "", ProductKeywords = new List<ProductKeyword>{ new ProductKeyword { Keyword = ""} }}
+                new ProductSearchDto{ProductId = "001", Description = "",  LargeImageUrl = "", OrderCount =  2323,
+                    ProductName = "", ProductKeywords = new List<ProductKeyword>{ new ProductKeyword { Keyword = ""} }}
             };
         }
 
-        protected internal void AddDocToIndex(IndexWriter writer, ProductSearchDto product, float totalOrderCount)
+        private static void AddDocToIndex(IndexWriter writer, ProductSearchDto product, float totalOrderCount)
         {
             var productOrderCountWeighting = Convert.ToSingle(product.OrderCount) / totalOrderCount * 100.0f;
 
